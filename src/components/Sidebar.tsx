@@ -74,7 +74,7 @@ const Sidebar = () => {
       {/* Desktop Sidebar */}
       <div
         className={`hidden sm:flex flex-col bg-white shadow-md h-screen fixed left-0 top-0 ${
-          isCollapsed ? "w-12" : "w-44"
+          isCollapsed ? "w-12" : "w-40"
         }`}
       >
         <div className="flex flex-col h-full">
