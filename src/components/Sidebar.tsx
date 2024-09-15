@@ -1,17 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
-  User,
   Settings,
-  HelpCircle,
   LogOut,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
-  Briefcase,
-  Database,
-  FileText,
+  BarChart2,
 } from "lucide-react";
 import {
   Tooltip,
@@ -19,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 interface MenuItemProps {
   href: string;
@@ -27,9 +24,7 @@ interface MenuItemProps {
 }
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  const { isCollapsed, toggleSidebar } = useSidebar();
 
   const MenuItem: React.FC<MenuItemProps> = ({ href, icon: Icon, text }) => (
     <TooltipProvider>
@@ -37,14 +32,14 @@ const Sidebar = () => {
         <TooltipTrigger asChild>
           <Link
             href={href}
-            className={`flex items-center py-2 px-3 text-gray-700 hover:bg-gray-200 rounded transition-all duration-300 ${
+            className={`flex items-center py-2 px-2 text-gray-700 hover:bg-gray-200 rounded transition-all duration-300 ${
               isCollapsed ? "justify-center" : ""
             }`}
           >
-            <Icon size={20} className={`min-w-[20px] ${isCollapsed ? "mx-auto" : ""}`} />
-            <span className={`ml-2 whitespace-nowrap ${isCollapsed ? "hidden" : "inline-block"}`}>
-              {text}
-            </span>
+            <div className="w-5 h-5 flex items-center justify-center">
+              <Icon size={16} strokeWidth={1.5} />
+            </div>
+            {!isCollapsed && <span className="ml-3 text-xs">{text}</span>}
           </Link>
         </TooltipTrigger>
         {isCollapsed && <TooltipContent side="right">{text}</TooltipContent>}
@@ -52,66 +47,87 @@ const Sidebar = () => {
     </TooltipProvider>
   );
 
+  const MobileMenuItem: React.FC<MenuItemProps> = ({
+    href,
+    icon: Icon,
+    text,
+  }) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link
+            href={href}
+            className="flex items-center justify-center text-gray-700 hover:bg-gray-200 rounded"
+          >
+            <div className="w-5 h-5 flex items-center justify-center">
+              <Icon size={16} strokeWidth={1.5} />
+            </div>
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent side="top">{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
   return (
-    <div
-      className={`bg-white shadow-md h-screen fixed left-0 top-0 flex flex-col transition-all duration-300 ${
-        isCollapsed ? "w-16" : "w-56"
-      }`}
-    >
-      <div className="p-3 flex-grow">
-        <h2
-          className={`text-xl font-semibold mb-6 py-2 px-3 rounded-md shadow-sm overflow-hidden whitespace-nowrap transition-all duration-300 ${
-            isCollapsed ? "text-center px-0" : ""
-          }`}
-        >
-          {isCollapsed ? "AT" : "AlgoTrader"}
-        </h2>
-        <nav>
-          <MenuItem href="/dashboard" icon={LayoutDashboard} text="Dashboard" />
-          <MenuItem href="/strategies" icon={Briefcase} text="Strategies" />
-          <MenuItem
-            href="/historical-data"
-            icon={Database}
-            text="Historical Data"
-          />
-          <MenuItem href="/reports" icon={FileText} text="Reports" />
-        </nav>
-      </div>
-      <div className="border-t p-3">
-        <div
-          className={`flex items-center mb-4 ${
-            isCollapsed ? "justify-center" : "px-3"
-          }`}
-        >
-          <User
-            size={20}
-            className={`min-w-[20px] ${isCollapsed ? "mx-auto" : ""}`}
-          />
-          <span className={`ml-2 text-sm whitespace-nowrap ${isCollapsed ? "hidden" : "inline-block"}`}>
-            John Doe
-          </span>
-        </div>
-        <nav>
-          <MenuItem
-            href="/account-settings"
-            icon={Settings}
-            text="Account Settings"
-          />
-          <MenuItem
-            href="/help-support"
-            icon={HelpCircle}
-            text="Help & Support"
-          />
-          <MenuItem href="/logout" icon={LogOut} text="Log Out" />
-        </nav>
-      </div>
-      <button
-        onClick={toggleSidebar}
-        className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md"
+    <>
+      {/* Desktop Sidebar */}
+      <div
+        className={`hidden sm:flex flex-col bg-white shadow-md h-screen fixed left-0 top-0 ${
+          isCollapsed ? "w-12" : "w-44"
+        }`}
       >
-        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
-    </div>
+        <div className="flex flex-col h-full">
+          <div className="py-4">
+              {isCollapsed ? (
+            <div className="flex items-center justify-center mb-4 h-6 overflow-hidden">
+                <span className="text-base font-bold text-gray-800">AT</span>
+            </div>
+              ) : (
+            <div className="flex items-center px-5 mb-4 h-6 overflow-hidden">
+                <h2 className="text-base font-semibold text-gray-800 whitespace-nowrap">
+                  AlgoTrader
+                </h2>
+            </div>
+              )}
+          </div>
+          <nav className="flex-grow space-y-1 px-2">
+            <MenuItem
+              href="/dashboard"
+              icon={LayoutDashboard}
+              text="Dashboard"
+            />
+            <MenuItem href="/analyse" icon={BarChart2} text="Analyse" />
+          </nav>
+          <div className="border-t px-2 py-2">
+            <MenuItem href="/settings" icon={Settings} text="Settings" />
+            <MenuItem href="" icon={LogOut} text="Logout" />
+          </div>
+        </div>
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md"
+        >
+          {isCollapsed ? (
+            <ChevronRight size={20} strokeWidth={1.5} />
+          ) : (
+            <ChevronLeft size={20} strokeWidth={1.5} />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white shadow-md h-12 flex items-center justify-around">
+        <MobileMenuItem
+          href="/dashboard"
+          icon={LayoutDashboard}
+          text="Dashboard"
+        />
+        <MobileMenuItem href="/analyse" icon={BarChart2} text="Analyse" />
+        <MobileMenuItem href="/settings" icon={Settings} text="Settings" />
+        <MobileMenuItem href="/logout" icon={LogOut} text="Logout" />
+      </div>
+    </>
   );
 };
 

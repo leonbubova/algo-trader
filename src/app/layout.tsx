@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Sidebar from "../components/Sidebar";
+import { SidebarProvider } from "@/contexts/SidebarContext";
+import ClientLayout from "@/components/ClientLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,17 +13,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Sidebar />
-        <main className="ml-16 p-4 transition-all duration-300">
-          {children}
-        </main>
+        <SidebarProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </SidebarProvider>
       </body>
     </html>
-  );
+  )
 }
